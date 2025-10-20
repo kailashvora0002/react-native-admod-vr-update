@@ -113,6 +113,13 @@ public class RNAdMobUnifiedAdQueueWrapper {
                 super.onAdImpression();
                 EventEmitter.sendEvent(mContext, CacheManager.EVENT_AD_IMPRESSION + ":" + name, getDefaultEventData());
 
+               
+                // mContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                // getId(),
+                // name,
+                // getDefaultEventData());
+                Log.i("AdMob repo", "onAdImpression2" + name);
+                notifyOnAdImpression();
             }
 
             @Override
@@ -120,21 +127,22 @@ public class RNAdMobUnifiedAdQueueWrapper {
                 super.onAdClosed();
                 WritableMap map = Arguments.createMap();
                 EventEmitter.sendEvent(mContext, CacheManager.EVENT_AD_CLOSED + ":" + name, getDefaultEventData());
-
+                 Log.i("AdMob repo", "onAdClosed" + name);
             }
 
             @Override
             public void onAdOpened() {
                 super.onAdOpened();
                 EventEmitter.sendEvent(mContext, CacheManager.EVENT_AD_OPEN + ":" + name, getDefaultEventData());
-
+                Log.i("AdMob repo", "onAdOpened" + name);
             }
 
             @Override
             public void onAdClicked() {
                 super.onAdClicked();
                 EventEmitter.sendEvent(mContext, CacheManager.EVENT_AD_CLICKED + ":" + name, getDefaultEventData());
-
+                Log.i("AdMob repo", "onAdClicked" + name);
+                notifyOnAdClicked();
             }
 
             @Override
@@ -142,6 +150,7 @@ public class RNAdMobUnifiedAdQueueWrapper {
                 super.onAdLoaded();
 
                 EventEmitter.sendEvent(mContext, CacheManager.EVENT_AD_PRELOAD_LOADED + ":" + name, getDefaultEventData());
+                Log.i("AdMob repo", "onAdLoaded2 " + name);
 
                 retryCount = 0;
                 if (mediation) {
@@ -178,6 +187,20 @@ public class RNAdMobUnifiedAdQueueWrapper {
         AdListener[] array = attachedAdListeners.toArray(new AdListener[0]);
         for (AdListener item : array) {
             item.onAdLoaded();
+        }
+    }
+    private void  notifyOnAdImpression(){
+        //use Iterator to prevent concurrentModificationException in ArrayList
+        AdListener[] array = attachedAdListeners.toArray(new AdListener[0]);
+        for (AdListener item : array) {
+            item.onAdImpression();
+        }
+    }
+    private void  notifyOnAdClicked(){
+        //use Iterator to prevent concurrentModificationException in ArrayList
+        AdListener[] array = attachedAdListeners.toArray(new AdListener[0]);
+        for (AdListener item : array) {
+            item.onAdClicked();
         }
     }
 

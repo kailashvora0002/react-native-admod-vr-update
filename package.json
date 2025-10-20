@@ -1,6 +1,6 @@
 {
   "name": "react-native-admod-vr-update",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "kailashvora0002 ",
   "description": "React Native Google Ads Admob is an easy way to monetize mobile apps with targeted, in-app advertising.",
   "main": "lib/commonjs/index.js",
@@ -51,7 +51,7 @@
       "targetSdk": 35,
       "compileSdk": 34,
       "buildTools": "34.0.0",
-      "googleMobileAds": "23.4.0",
+      "googleMobileAds": "24.5.0",
       "googleUmp": "3.0.0"
     }
   },

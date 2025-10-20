@@ -170,7 +170,6 @@ public class RNAdmobNativeView extends LinearLayout {
                 nativeAdView.setMediaView(nativeAdView.findViewById(id));
                 mediaView.requestLayout();
                 setNativeAd();
-
             }
         } catch (Exception e) {
 
@@ -256,45 +255,6 @@ public class RNAdmobNativeView extends LinearLayout {
             }
 
             sendEvent(RNAdmobNativeViewManager.EVENT_NATIVE_AD_LOADED,args);
-
-            nativeAd.setOnPaidEventListener(new OnPaidEventListener() {
-                @Override
-                public void onPaidEvent(AdValue adValue) {
-                    WritableMap payload = Arguments.createMap();
-                    payload.putDouble("value", 1e-6 * adValue.getValueMicros());
-                    payload.putDouble("precision", adValue.getPrecisionType());
-                    payload.putString("currency", adValue.getCurrencyCode());
-
-                    ResponseInfo responseInfo = nativeAd.getResponseInfo();
-                    AdapterResponseInfo loadedAdapterInfo = responseInfo.getLoadedAdapterResponseInfo();
-                    WritableMap loadedAdapterMap = Arguments.createMap();
-                    if (loadedAdapterInfo != null) {
-                        loadedAdapterMap.putString("Adapter", loadedAdapterInfo.getAdapterClassName());
-                        loadedAdapterMap.putDouble("Latency", loadedAdapterInfo.getLatencyMillis());
-                        loadedAdapterMap.putString("Ad Source Name", loadedAdapterInfo.getAdSourceName());
-                        loadedAdapterMap.putString("Ad Source ID", loadedAdapterInfo.getAdSourceId());
-                        loadedAdapterMap.putString("Ad Source Instance Name", loadedAdapterInfo.getAdSourceInstanceName());
-                        loadedAdapterMap.putString("Ad Source Instance ID", loadedAdapterInfo.getAdSourceInstanceId());
-                        
-                        Bundle credentials = loadedAdapterInfo.getCredentials();
-                        if (credentials != null) {
-                            WritableMap credentialsMap = Arguments.createMap();
-                            for (String key : credentials.keySet()) {
-                                credentialsMap.putString(key, credentials.getString(key));
-                            }
-                            loadedAdapterMap.putMap("Credentials", credentialsMap);
-                        }
-
-                      
-                    }
-
-                    payload.putMap("responseInfo", loadedAdapterMap);
-
-                    sendEvent(RNAdmobNativeViewManager.EVENT_AD_FAID, payload);
-                }
-            });
-
-
             setNativeAd();
         } catch (Exception e) {
             e.printStackTrace();
@@ -322,7 +282,6 @@ public class RNAdmobNativeView extends LinearLayout {
     }
 
     public void loadAd() {
-         Log.d("AdMobDeviceId", "adRepo: " + adRepo);
         if (adRepo != null) {
             getAdFromRepository();
         } else {
@@ -431,13 +390,20 @@ public class RNAdmobNativeView extends LinearLayout {
         adOptions.enableCustomClickGestureDirection(direction, tapsAllowed);
     }
 
+    public NativeAd lastNativeAd;
+    public MediaView lastMediaView;
     public void setNativeAd() {
         try {
-            
-            if (nativeAdView != null && nativeAd != null) {
-                nativeAdView.setNativeAd(nativeAd);
+            if (nativeAdView != null && nativeAd != null ) {
 
-                if (nativeAdView.getMediaView() != null) {
+                if(lastNativeAd != nativeAd){
+                    lastNativeAd = nativeAd;
+                    nativeAdView.setNativeAd(nativeAd);
+                }
+                MediaView viewMedia = nativeAdView.getMediaView();
+                if (viewMedia != null && lastMediaView != viewMedia) {
+                    nativeAdView.setNativeAd(nativeAd);
+                    lastMediaView = viewMedia;
                     nativeAdView.getMediaView().setMediaContent(nativeAd.getMediaContent());
                     if (Objects.requireNonNull(nativeAd.getMediaContent()).hasVideoContent()) {
                         mediaView.setVideoController(nativeAd.getMediaContent().getVideoController());
